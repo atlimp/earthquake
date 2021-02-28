@@ -58,7 +58,7 @@ async function getEarthQuakeData(area) {
     }    
 }
 
-async function getCategories(lang = 'IS') {
+async function getCategories() {
     const baseUrl = process.env.BASE_URL_IS;
     const html = await get(baseUrl);
 

@@ -23,11 +23,14 @@ app.get('/earthquakes', async (req, res) => {
     const { area = '' } = req.query;
 
     if (!area)
-        return res.status(400).json({ error: "No area specified" });
+        return res.status(400).json({ error: 'No area specified, find valid areas on /areas' });
 
     try {
         const result = await getEarthQuakeData(area);
-        return res.json(result);
+        return res.json({
+            count: result.length,
+            data: result
+        });
     } catch (e) {
         console.error(e);
         return res.status(500).json({ error: 'Something went wrong' });
