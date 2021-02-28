@@ -1,6 +1,7 @@
 require('isomorphic-fetch');
 require('dotenv').config();
 const cheerio = require('cheerio');
+const { getCached, setCached } = require('./caching');
 
 async function get(url) {
     try {
@@ -12,35 +13,49 @@ async function get(url) {
         return null;
     } catch (e) {
         console.error(e);
-        return null;
+        throw e;
     }
 }
 
 async function getEarthQuakeData(area) {
+    const cached = await getCached(area);
+    
+    if (cached) {
+        return cached;
+    }
+    
     baseUrl = process.env.BASE_URL_IS;
-
+    
     let url = `${baseUrl}${area}`;
-
+    
     if (area === 'all')
-        url = baseUrl;
-
+    url = baseUrl;
+    
     const html = await get(url);
     
     if (html == null) return [];
 
-    const arr = eval(html.match(/VI.quakeInfo = .*/g)[0].split(' = ')[1]);
-    
-    return arr.map((e) => {
-        return {
-            datetime: e.t,
-            depth: Number(e.dep.replace(',', '.')),
-            location: `${Number(e.dL.replace(',', '.'))} km ${e.dD} af ${e.dR}`,
-            lat: Number(e.lat.replace(',', '.')),
-            lon: Number(e.lon.replace(',', '.')),
-            quality: Number(e.q.replace(',', '.')),
-            magnitude: Number(e.s.replace(',', '.'))
-        }
-    });
+    try {
+        const arr = eval(html.match(/VI.quakeInfo = .*/g)[0].split(' = ')[1]);
+        const mapped = arr.map((e) => {
+            return {
+                datetime: e.t,
+                depth: Number(e.dep.replace(',', '.')),
+                location: `${Number(e.dL.replace(',', '.'))} km ${e.dD} af ${e.dR}`,
+                lat: Number(e.lat.replace(',', '.')),
+                lon: Number(e.lon.replace(',', '.')),
+                quality: Number(e.q.replace(',', '.')),
+                magnitude: Number(e.s.replace(',', '.'))
+            }
+        });
+
+        setCached(area, mapped);
+
+        return mapped;
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }    
 }
 
 async function getCategories(lang = 'IS') {

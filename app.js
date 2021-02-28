@@ -25,16 +25,25 @@ app.get('/earthquakes', async (req, res) => {
     if (!area)
         return res.status(400).json({ error: "No area specified" });
 
-    const result = await getEarthQuakeData(area);
-    return res.json(result);
+    try {
+        const result = await getEarthQuakeData(area);
+        return res.json(result);
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({ error: 'Something went wrong' });
+    }
+    
 });
 
 app.get('/areas', async (req, res) => {
-    const result = await getCategories();
-    return res.json(result);
-})
-
-
+    try {
+        const result = await getCategories();
+        return res.json(result);
+    } catch (e) {
+        console.error(e);
+        return res.status(500).json({ error: 'Something went wrong' });
+    }
+});
 
 app.listen(port, () => {
     console.log(`Server running on ${host}:${port}`);
