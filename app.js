@@ -1,5 +1,7 @@
 const express = require('express');
 const { getEarthQuakeData, getCategories } = require('./scraper');
+const cors = require('cors');
+
 
 const app = express();
 
@@ -7,6 +9,8 @@ const {
     HOST: host = '127.0.0.1',
     PORT: port = 3000,
 } = process.env;
+
+app.use(cors());
 
 app.get('/', (req, res) => {
     return res.json([
