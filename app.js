@@ -11,21 +11,22 @@ const {
 app.get('/', (req, res) => {
     return res.json([
         '/earthquakes',
-        '/categories'
+        '/areas'
     ]);
 });
 
 app.get('/earthquakes', async (req, res) => {
-    const { l = '', q = '' } = req.query;
+    const { area = '' } = req.query;
 
-    const result = await getEarthQuakeData(q, l);
+    if (!area)
+        return res.status(400).json({ error: "No area specified" });
+
+    const result = await getEarthQuakeData(area);
     return res.json(result);
 });
 
-app.get('/categories', async (req, res) => {
-    const { l } = req.query;
-
-    const result = await getCategories(l);
+app.get('/areas', async (req, res) => {
+    const result = await getCategories();
     return res.json(result);
 })
 

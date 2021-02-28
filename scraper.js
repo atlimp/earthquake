@@ -16,15 +16,14 @@ async function get(url) {
     }
 }
 
-function getBaseUrl(lang) {
-    if (lang === 'IS') return process.env.BASE_URL_IS;
-    return process.env.BASE_URL_EN;
-}
+async function getEarthQuakeData(area) {
+    baseUrl = process.env.BASE_URL_IS;
 
-async function getEarthQuakeData(category, lang = 'IS') {
-    baseUrl = getBaseUrl(lang);
+    let url = `${baseUrl}${area}`;
 
-    const url = `${baseUrl}${category}`;
+    if (area === 'all')
+        url = baseUrl;
+
     const html = await get(url);
     
     if (html == null) return [];
@@ -35,7 +34,7 @@ async function getEarthQuakeData(category, lang = 'IS') {
         return {
             datetime: e.t,
             depth: Number(e.dep.replace(',', '.')),
-            location: `${Number(e.dL.replace(',', '.'))} km ${e.dD} ${lang === 'IS' ? 'af' : 'of'} ${e.dR}`,
+            location: `${Number(e.dL.replace(',', '.'))} km ${e.dD} af ${e.dR}`,
             lat: Number(e.lat.replace(',', '.')),
             lon: Number(e.lon.replace(',', '.')),
             quality: Number(e.q.replace(',', '.')),
@@ -45,7 +44,7 @@ async function getEarthQuakeData(category, lang = 'IS') {
 }
 
 async function getCategories(lang = 'IS') {
-    const baseUrl = getBaseUrl(lang);
+    const baseUrl = process.env.BASE_URL_IS;
     const html = await get(baseUrl);
 
     const $ = cheerio.load(html);
