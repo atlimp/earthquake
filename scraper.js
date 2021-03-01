@@ -67,9 +67,13 @@ async function getCategories() {
     const categories = [];
 
     const list = $('.level2 li').each((i, el) => {
-        const href = $(el).find('a').attr('href');
+        const a = $(el).find('a');
+        const href = a.attr('href');
         const split = href.split('/');
-        categories.push(split[split.length - 2]);
+        categories.push({
+            name: a.text(),
+            path: split[split.length - 2],
+        });
     });
 
     return categories;
